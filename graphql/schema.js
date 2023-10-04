@@ -6,6 +6,11 @@ export const schema = new GraphQLSchema({
         fields: {
             hello: {
                 type: GraphQLString,
+                resolve: () => 'hello',
+            },
+
+            world: {
+                type: GraphQLString,
                 resolve: () => 'world',
             },
         },
