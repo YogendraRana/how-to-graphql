@@ -19,6 +19,11 @@ export const apolloServer = new ApolloServer({ typeDefs, resolvers });
 
 // start apollo server 
 export const startApolloServer = async () => {
-    const { url } = await startStandaloneServer(apolloServer, { listen: { port: 4000 }});
+    const { url } = await startStandaloneServer(apolloServer, { 
+        listen: { port: 4000 },
+        context: async ({req, res}) => {
+            return {req, res};
+        }
+    });
     console.log(chalk.bgCyan(`Apollo Server ready at ${url}`));
 }

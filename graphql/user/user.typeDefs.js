@@ -10,7 +10,7 @@ const userTypeDefs = `#graphql
     type RegisterResponse {
         success: Boolean!
         message: String!
-        user: User
+        access_token: String!
     }
 
 
@@ -24,9 +24,7 @@ const userTypeDefs = `#graphql
     # mutation type
     type Mutation {
         registerUser (name: String, email: String!, password: String!, confirm_password: String!): RegisterResponse!, 
-        
-        
-        deleteUser(id: ID!): [User],
+        loginUser (email: String!, password: String!): RegisterResponse!,
     }
 `;
 
