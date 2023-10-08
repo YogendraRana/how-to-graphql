@@ -4,7 +4,6 @@ import mongoose from 'mongoose';
 const userSchema = mongoose.Schema({
     name: {
         type: String,
-        required: true
     },
     email:{
         type: String,
@@ -32,9 +31,7 @@ const userSchema = mongoose.Schema({
 
 userSchema.pre('save', async function(next) {
     if(!this.isModified('password')) next();
-    const salt = await bcrypt.genSalt();
-    this.password = await bcrypt.hash(this.password, salt);
-    this.confirmPassword = await bcrypt.hash(this.confirmPassword, salt);
+    this.password = await bcrypt.hash(this.password, 10);
     next();
 });
 

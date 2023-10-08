@@ -28,5 +28,5 @@ startApolloServer();
 // listen
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-    console.log(chalk.bgBlue(`Server is running on port ${PORT}`));
+    console.log(chalk.bgBlue(`Express is running on port ${PORT}`));
 });
