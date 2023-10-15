@@ -8,8 +8,8 @@ const userResolvers = {
     },
 
     Mutation: {
+        // register user
         registerUser: async (parent, { name, email, password, confirm_password }, context, info) => {
-            // validate user data
             if (password !== confirm_password) throw new Error('Passwords do not match');
             if (!email || !password || !confirm_password) throw new Error('Please fill all required fields');
 
@@ -31,24 +31,27 @@ const userResolvers = {
             await newUser.save();
 
             // set cookie
-            context.res.cookie('refresh_token', refresh_token, {
+            context.res.status(201).cookie('refresh_token', refresh_token, {
                 httpOnly: true,
                 secure: true,
                 sameSite: 'none',
                 maxAge: 24 * 60 * 60 * 1000
             });
-
-            context.res.status(201).json({
+            
+            return {
                 success: true,
                 message: 'User created successfully',
                 access_token: access_token,
-                user: newUser,
-            });
+                new_user: newUser,
+            };
         },
 
 
+        // login user
         loginUser: async (parent, { email, password }, context, info) => {
             if (!email || !password) throw new Error('Please fill all required fields');
+
+            console.log(context.req.cookies)
 
             const user = await User.findOne({ email: email });
             if (!user) throw new Error('User does not exist');
@@ -69,13 +72,26 @@ const userResolvers = {
                 sameSite: 'none',
                 maxAge: 24 * 60 * 60 * 1000
             });
-
-            context.res.status(200).json({
+            
+            return {
                 success: true,
                 message: 'User logged in successfully',
                 access_token: access_token,
-                user: user,
-            });
+            };
+        },
+
+        
+        // delete user
+        deleteUser: async (parent, { email }, context, info) => {
+            const user = await User.findOne({email: email});
+            if (!user) throw new Error('User does not exist');
+            await User.deleteOne({email: email})
+
+            return {
+                success: true,
+                message: 'User deleted successfully',
+                deleted_user: user,
+            };
         },
     }
 };
