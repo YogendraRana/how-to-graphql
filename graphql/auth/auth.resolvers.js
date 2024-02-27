@@ -1,26 +1,27 @@
 import bcrypt from 'bcrypt'
-import jwt from 'jsonwebtoken';
-import { User } from '../../models/userModel.js';
+import { UserModel } from '../../models/userModel.js';
 
-const userResolvers = {
+export const authResolvers = {
     Query: {
 
     },
 
     Mutation: {
         // register user
-        registerUser: async (parent, { name, email, password, confirm_password }, context, info) => {
+        registerUser: async (parent, args, context, info) => {
+            const { name, email, password, confirm_password } = args;
+
             if (password !== confirm_password) throw new Error('Passwords do not match');
             if (!email || !password || !confirm_password) throw new Error('Please fill all required fields');
 
             // check if user exists in mongodb
-            const user = await User.findOne({ email: email });
+            const user = await UserModel.findOne({ email: email });
             if (user) {
                 throw new Error('User already exists');
             }
 
             // create new user
-            const newUser = new User({ name, email, password });
+            const newUser = new UserModel({ name, email, password });
 
             // generate token
             const access_token = newUser.createAccessToken();
@@ -37,7 +38,7 @@ const userResolvers = {
                 sameSite: 'none',
                 maxAge: 24 * 60 * 60 * 1000
             });
-            
+
             return {
                 success: true,
                 message: 'User created successfully',
@@ -51,9 +52,7 @@ const userResolvers = {
         loginUser: async (parent, { email, password }, context, info) => {
             if (!email || !password) throw new Error('Please fill all required fields');
 
-            console.log(context.req.cookies)
-
-            const user = await User.findOne({ email: email });
+            const user = await UserModel.findOne({ email: email });
             if (!user) throw new Error('User does not exist');
 
             const isMatch = await bcrypt.compare(password, user.password);
@@ -72,28 +71,12 @@ const userResolvers = {
                 sameSite: 'none',
                 maxAge: 24 * 60 * 60 * 1000
             });
-            
+
             return {
                 success: true,
                 message: 'User logged in successfully',
                 access_token: access_token,
             };
         },
-
-        
-        // delete user
-        deleteUser: async (parent, { email }, context, info) => {
-            const user = await User.findOne({email: email});
-            if (!user) throw new Error('User does not exist');
-            await User.deleteOne({email: email})
-
-            return {
-                success: true,
-                message: 'User deleted successfully',
-                deleted_user: user,
-            };
-        },
     }
 };
-
-export default userResolvers;

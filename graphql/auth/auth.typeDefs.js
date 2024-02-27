@@ -1,4 +1,4 @@
-const userTypeDefs = `#graphql
+export const authTypeDefs = `#graphql
     type User {
         id: ID!
         name: String
@@ -47,5 +47,3 @@ const userTypeDefs = `#graphql
         deleteUser (email: String!): DeleteUserResponse!,
     }
 `;
-
-export default userTypeDefs;
